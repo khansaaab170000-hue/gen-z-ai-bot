@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMEER KHAN - GEN-Z AI BOT</title>
+<style>
+body{margin:0;background:#050018;color:#fff;font-family:Arial;text-align:center}
+.header{background:linear-gradient(90deg,#00f0ff,#a100ff);padding:15px;font-weight:bold;font-size:22px}
+.robot{font-size:70px;margin:10px}
+.box{background:#12002b;margin:15px;padding:15px;border-radius:20px;border:2px solid #00f0ff}
+.pairs button{padding:10px 15px;margin:5px;border:none;border-radius:20px;background:#222;color:#fff;font-weight:bold}
+.pairs button.active{background:#00f0ff;color:#000}
+.signal{font-size:40px;font-weight:bold;margin:15px}
+button.main{padding:15px 40px;font-size:20px;background:#00ff00;border:none;border-radius:30px;font-weight:bold}
+.timer{color:#ffcc00;font-size:18px;margin:10px}
+.features{text-align:left;padding:10px;font-size:14px}
+.features div{margin:6px}
+</style>
+</head>
+<body>
+<div class="header">🤖 GEN-Z AI BOT • SMART TRADING • POWERED BY AI</div>
+<div class="robot">🤖</div>
+<h2 style="color:#00f0ff">AMEER KHAN GEN-Z BOT</h2>
+<p>TRADE SMART WITH GEN-Z</p>
+<div class="box">
+<h3>🔥 MULTI-PAIR SUPPORT</h3>
+<div class="pairs">
+<button onclick="select(this)">BTC</button>
+<button onclick="select(this)">ETH</button>
+<button class="active" onclick="select(this)">EUR/USD</button>
+<button onclick="select(this)">GBP/USD</button>
+<button onclick="select(this)">XAU/USD</button>
+</div>
+<p>Selected Pair: <b id="pair">EUR/USD</b></p>
+<p class="timer">⏱️ Next Signal In: <span id="count">30</span> Sec</p>
+<button class="main" onclick="getSignal()">GET AI SIGNAL 🚀</button>
+<div class="signal" id="sig">WAITING...</div>
+<p>AI Accuracy: 92%</p>
+</div>
+<div class="box features">
+<div>✅ AI SIGNALS</div>
+<div>✅ SMART ANALYSIS</div>
+<div>✅ AUTO TRADING MODE</div>
+<div>✅ CUSTOM SETTINGS</div>
+<div>✅ REAL-TIME MARKET DATA</div>
+<div>✅ 24/7 SUPPORT</div>
+</div>
+<p style="color:#aaa;font-size:12px">Demo Bot For Learning Only • Trading Me Risk Hai</p>
+<script>
+function select(btn){
+document.querySelectorAll(".pairs button").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+document.getElementById("pair").innerText=btn.innerText;
+}
+function getSignal(){
+let s=Math.random()>0.5?"CALL 🟢 UP":"PUT 🔴 DOWN";
+let el=document.getElementById("sig");
+el.innerText=s;
+el.style.color=s.includes("CALL")?"#00ff00":"#ff0000";
+}
+</script>
+</body>
+  </html>
