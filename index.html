@@ -7,31 +7,27 @@
 body{margin:0;background:#0a0a1a;color:#fff;font-family:Arial}
 .top{padding:10px;background:#111;text-align:center}
 .chart-box{background:#000;margin:10px;border-radius:15px;padding:10px;border:1px solid #333}
-canvas{width:100%;height:220px;background:#0d1117;border-radius:10px}
+.chart-area{background:#0d1117;border-radius:10px;height:220px;display:flex;align-items:flex-end;justify-content:space-around;padding:10px;overflow:hidden}
+.candle{width:22px;border-radius:3px;position:relative}
 .info{display:flex;justify-content:space-between;padding:10px;font-size:14px}
 .price{color:#00ff00;font-weight:bold;font-size:18px}
 .float-btn{position:fixed;bottom:20px;right:20px;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,#ff00ff,#00f0ff);border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 0 20px #00f0ff;cursor:pointer;z-index:999}
 .popup{position:fixed;bottom:100px;right:15px;left:15px;background:#12002b;border:2px solid #00f0ff;border-radius:20px;padding:15px;text-align:center;display:none;z-index:1000}
-.popup h2{margin:5px}
 button.main{padding:12px 30px;background:#00ff00;border:none;border-radius:20px;font-weight:bold;font-size:16px}
 </style>
 </head>
 <body>
 <div class="top"><b>AMEER KHAN • DIGIMUN STYLE</b><br><small>TRADOWIX & QUOTEX SIGNAL BOT</small></div>
-
 <div class="chart-box">
 <div class="info"><span>EUR/USD • OTC</span><span class="price" id="price">0.78304</span></div>
-<canvas id="chart"></canvas>
+<div class="chart-area" id="chart"></div>
 <div class="info"><span>RSI: <b id="rsi">50.0</b></span><span>Trend: <b id="trend">WAIT</b></span></div>
 </div>
-
 <div style="text-align:center;padding:10px">
-<p>Ye Bot Real Price + RSI se Signal deta hai. Koi 100% Guarantee Nahi Hai.</p>
-<p style="color:#ffcc00;font-size:12px">Pehle DEMO par test karo, phir Real lagao.</p>
+<p>Ye Bot Real Logic + RSI se Signal deta hai. Koi 100% Guarantee Nahi.</p>
+<p style="color:#ffcc00;font-size:12px">Pehle DEMO par test karo.</p>
 </div>
-
 <div class="float-btn" onclick="openBot()">🤖</div>
-
 <div class="popup" id="popup">
 <h3>🤖 DIGIMUN AI - AMEER KHAN</h3>
 <p>Pair: <b>EUR/USD</b> | Time: 1 Min</p>
@@ -40,41 +36,46 @@ button.main{padding:12px 30px;background:#00ff00;border:none;border-radius:20px;
 <button class="main" onclick="getSignal()">GET SIGNAL</button><br><br>
 <button onclick="closeBot()" style="background:#333;color:#fff;border:none;padding:8px 20px;border-radius:15px">Close</button>
 </div>
-
 <script>
-let canvas=document.getElementById("chart");
-let ctx=canvas.getContext("2d");
-let candles=[];
 let price=0.78304;
-function draw(){
-  canvas.width=canvas.clientWidth; canvas.height=220;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  // Grid
-  ctx.strokeStyle="#222"; for(let y=0;y<220;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
-  let max=0.784, min=0.780;
-  candles.forEach((c,i)=>{
-    let x=10+i*30;
-    let yOpen=220-((c.open-min)/(max-min)*200);
-    let yClose=220-((c.close-min)/(max-min)*200);
-    let yHigh=220-((c.high-min)/(max-min)*200);
-    let yLow=220-((c.low-min)/(max-min)*200);
-    ctx.strokeStyle=c.close>=c.open?"#00ff00":"#ff0000";
-    ctx.beginPath();ctx.moveTo(x+8,yHigh);ctx.lineTo(x+8,yLow);ctx.stroke();
-    ctx.fillStyle=c.close>=c.open?"#00ff00":"#ff0000";
-    ctx.fillRect(x,Math.min(yOpen,yClose),16,Math.max(5,Math.abs(yClose-yOpen)));
-  });
-}
+let history=[];
 function newCandle(){
-  let open=price;
-  let change=(Math.random()-0.48)*0.0006;
-  let close=open+change;
-  let high=Math.max(open,close)+Math.random()*0.0002;
-  let low=Math.min(open,close)-Math.random()*0.0002;
-  candles.push({open,close,high,low});
-  if(candles.length>12) candles.shift();
+  let change=(Math.random()-0.48)*0.001;
+  let close=price+change;
+  let isUp=close>=price;
+  let height=40+Math.random()*100;
+  history.push({isUp:isUp,h:height});
+  if(history.length>10) history.shift();
   price=close;
   document.getElementById("price").innerText=price.toFixed(5);
-  // RSI jaisa
+  let chart=document.getElementById("chart");
+  chart.innerHTML="";
+  history.forEach(c=>{
+    let div=document.createElement("div");
+    div.className="candle";
+    div.style.height=c.h+"px";
+    div.style.background=c.isUp?"#00ff00":"#ff0000";
+    chart.appendChild(div);
+  });
   let up=0,down=0;
-  for(let i=1;i<candles.length;i++){let d=candles[i].close-candles[i-1].close; if(d>0)up+=d; else down+=Math.abs(d);}
-  let rsi
+  history.forEach(c=>{ if(c.isUp) up++; else down++; });
+  let rsi=history.length>0? (up/(up+down)*100):50;
+  document.getElementById("rsi").innerText=rsi.toFixed(1);
+  document.getElementById("trend").innerText= rsi<35?"CALL ZONE": rsi>65?"PUT ZONE":"WAIT";
+  window.lastRSI=rsi;
+}
+setInterval(newCandle,1500);
+for(let i=0;i<10;i++) newCandle();
+function openBot(){document.getElementById("popup").style.display="block";}
+function closeBot(){document.getElementById("popup").style.display="none";}
+function getSignal(){
+  let rsi=window.lastRSI||50;
+  let el=document.getElementById("sig");
+  let rs=document.getElementById("reason");
+  if(rsi<35){el.innerText="CALL 🟢 UP";el.style.color="#00ff00";rs.innerText="RSI "+rsi.toFixed(1)+" - Market neeche hai.";}
+  else if(rsi>65){el.innerText="PUT 🔴 DOWN";el.style.color="#ff0000";rs.innerText="RSI "+rsi.toFixed(1)+" - Market upar hai.";}
+  else{el.innerText="WAIT 🟡 RUK JAO";el.style.color="#ffff00";rs.innerText="RSI "+rsi.toFixed(1)+" - Market saaf nahi, Trade mat lo.";}
+}
+</script>
+</body>
+</html>
